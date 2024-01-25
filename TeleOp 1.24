@@ -1,0 +1,240 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+//import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.Servo;
+
+
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp (name = "Center stage 23-24")
+public class TeleOp extends OpMode {
+    protected DcMotor frontLeft;
+    protected DcMotor frontRight;
+    protected DcMotor backLeft;
+    protected DcMotor backRight;
+    protected DcMotor linearActuator;
+    protected DcMotor linearPan;
+    private CRServo intakeLeft;
+    private CRServo intakeRight;
+    private Servo backDoorLeft;
+    private Servo backDoorRight;
+    private Servo mainHandLeft;
+    private Servo mainHandRight;
+    private Servo trussRight;
+    private Servo trussLeft;
+ //   private Servo paperLaunch;
+
+    @Override
+    public void init() {
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        linearActuator = hardwareMap.get(DcMotor.class, "linearActuator");
+        linearPan = hardwareMap.get(DcMotor.class, "linearPan");
+        intakeLeft = hardwareMap.get(CRServo.class, "intakeLeft");
+        intakeRight = hardwareMap.get(CRServo.class, "intakeRight");
+        backDoorRight = hardwareMap.get(Servo.class, "backDoorRight");
+        backDoorLeft = hardwareMap.get(Servo.class, "backDoorLeft");
+        mainHandLeft = hardwareMap.get(Servo.class, "mainHandLeft");
+        mainHandRight = hardwareMap.get(Servo.class, "mainHandRight");
+        trussRight = hardwareMap.get(Servo.class, "trussRight");
+        trussLeft = hardwareMap.get(Servo.class, "trussLeft");
+ //       paperLaunch = hardwareMap.get(Servo.class, "paperLaunch");
+
+  //      frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+  //      backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearPan.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearActuator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        telemetry.addData("Status", "Initialized");
+
+
+    }
+
+    @Override
+    public void loop() {
+
+//Telemetry
+
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        linearPan.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        linearActuator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+
+// Movement Code this is field centric
+
+
+        float gamepad1LeftY = -gamepad1.left_stick_y;
+        float gamepad1LeftX = gamepad1.left_stick_x;
+        float gamepad1RightX = gamepad1.right_stick_x;
+
+        // holonomic formulas
+
+        float FrontLeft = -gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+        float FrontRight = gamepad1LeftY - gamepad1LeftX - gamepad1RightX;
+        float BackRight = gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+        float BackLeft = -gamepad1LeftY + gamepad1LeftX - gamepad1RightX;
+
+        // clip the right/left values so that the values never exceed +/- 1
+        FrontRight = Range.clip(FrontRight, -1, 1);
+        FrontLeft = Range.clip(FrontLeft, -1, 1);
+        BackLeft = Range.clip(BackLeft, -1, 1);
+        BackRight = Range.clip(BackRight, -1, 1);
+
+        // write the values to the motors
+        frontRight.setPower(FrontRight);
+        frontLeft.setPower(FrontLeft);
+        backLeft.setPower(BackLeft);
+        backRight.setPower(BackRight);
+
+
+//Linear Actuator Movement
+
+
+        //Move linear actuator up and down.
+        if (gamepad1.dpad_up) {
+            // Move linear actuator up (adjust as needed)
+            linearActuator.setPower(1.0);
+        } else if (gamepad1.dpad_down) {
+            // Move linear actuator down (adjust as needed)
+            linearActuator.setPower(-1.0);
+        } else {
+            // Stop linear actuator
+            linearActuator.setPower(0);
+        }
+        //Move Linear actuator pan motor using dpad
+
+        if (gamepad1.dpad_left) {
+            // Move linear pan left (adjust as needed)
+            linearPan.setPower(1);
+        } else linearPan.setPower(0);
+
+        if (gamepad1.dpad_right) {
+            // Move linear pan right (adjust as needed)
+            linearPan.setPower(-1);
+        } else linearPan.setPower(0);
+
+        linearPan.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        linearPan.setPower(0);
+            // Stop linear pan
+
+
+
+        //Servos
+
+
+//Intake Servos
+/*        while (gamepad2.cross) {
+            // intake servo in (adjust as needed)
+            intakeRight.setPower(1);
+            intakeLeft.setPower(-1);
+        }
+        while (gamepad2.triangle) {
+           // intake servo out (adjust as needed)
+            intakeRight.setPower(-1.0);
+            intakeLeft.setPower(1);
+        }
+        intakeLeft.setPower(0);
+        intakeRight.setPower(0);
+*/
+        if (gamepad2.cross) {
+            intakeRight.setPower(1);
+            intakeLeft.setPower(-1);
+        } else {
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
+        }
+        if (gamepad2.triangle) {
+            intakeRight.setPower(-1);
+            intakeLeft.setPower(1);
+        } else {
+            intakeLeft.setPower(0);
+            intakeRight.setPower(0);
+        }
+
+
+//Drop servos
+        if (gamepad2.square) {
+            // intake servo in (adjust as needed)
+            backDoorRight.setPosition(0.0);
+            backDoorRight.setPosition(0.0);
+        }
+//Reset servo position
+        if (gamepad2.circle) {
+            backDoorLeft.setPosition(.7);
+            backDoorLeft.setPosition(-.7);
+        }
+
+
+
+//Main hand movement
+        //main hand right
+        if (gamepad1.a) {
+            mainHandRight.setPosition(-.75);
+            mainHandLeft.setPosition(.75);
+        } else if (gamepad1.b)
+            mainHandRight.setPosition(.75);
+        mainHandLeft.setPosition(-.75);
+
+
+
+
+
+//Truss movement
+        if (gamepad2.right_bumper) {
+            trussLeft.setPosition(1.0);
+            trussRight.setPosition(-1.0);
+        } else if (gamepad2.left_bumper) {
+            trussLeft.setPosition(-1.0);
+            trussRight.setPosition(1.0);
+        }
+
+
+
+//Paper airplane launch
+  //      if (gamepad2.dpad_up) {
+  //                paperLaunch.setPosition(90);
+  //      }
+
+
+//Telemetry
+
+
+     //   double ticks4 = 5,281.1;
+        // ticks 0,1,2,3,5 = 537.7
+
+
+        int position0 = frontLeft.getCurrentPosition();
+        int position2 = backLeft.getCurrentPosition();
+        int position4 = linearActuator.getCurrentPosition();
+        int position5 = linearPan.getCurrentPosition();
+        telemetry.addData("FrontLeft", position0);
+        telemetry.addData("BackLeft", position2);
+        telemetry.addData("LinearActuator", position4);
+        telemetry.addData("LinearPan", position5);
+        telemetry.update();
+
+
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
